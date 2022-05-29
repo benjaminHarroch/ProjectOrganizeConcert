@@ -1,3 +1,6 @@
+//**********///
+//ID :209877729
+//**********///
 
 #include "Header.h"
 
@@ -8,8 +11,6 @@ void main(int argc, char** argv) {
 	CONCERT concert;
 
 	buildBinaryTreeFromFile(argv[1],&tr);
-	printTree(tr);
-	printf("\n");
 	saveMusicianFromFile(argv[2],&tr);
-
+	freeTree(&tr);
 }

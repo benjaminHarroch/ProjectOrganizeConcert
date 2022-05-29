@@ -1,8 +1,5 @@
 
-//לא לשכח לבדוק בסוף הפרוייקט את כל האלוקציות במקות
-//ולא לשכח לשחרר זיכרון של כל מה שצריך לשחרר
-//לא לשכח לסגור קבצים
-//לא לשכח לשים לב לDEFINE של CONST
+
 #include "Header.h"
 
 
@@ -27,6 +24,8 @@ void buildBinaryTreeFromFile(char* filename, InstrumentTree *tr) {
 		flage = 0;
 	}
 	
+	//after building the tree can left and free the instrumet
+	free(instrument);
 	fclose(fp);
 }
 
@@ -39,6 +38,7 @@ TreeNode* creatTreeNode(char *instrument, unsigned short *insID, TreeNode *left,
 	newNode->insID = *insID;
 	size = strlen(instrument);
 	newNode->instrument = (char*)malloc(size+1);
+	chekeAlloction(newNode->instrument);
 	strcpy(newNode->instrument, instrument);
 	newNode->instrument[size + 1] = '\0';
 
@@ -70,6 +70,7 @@ char* getTheInstrument(FILE* fp) {
 	instrument[sizeOfname+1] = '\0';
 
 	instrument = (char*)realloc(instrument, (sizeOfname+1));
+	chekeAlloction(instrument);
 	
 	return instrument;
 }
@@ -125,9 +126,9 @@ void helperBuild(TreeNode *root,char* instrument,int *flage,int *id) {
 	}
 }
 
-void freeTree(InstrumentTree tr) {
+void freeTree(InstrumentTree *tr) {
 
-	FreeTreehelper(tr.root);
+	FreeTreehelper(tr->root);
 }
 
 void  FreeTreehelper(TreeNode* root) {
@@ -139,39 +140,17 @@ void  FreeTreehelper(TreeNode* root) {
 
 		FreeTreehelper(root->left);
 		FreeTreehelper(root->right);
-		free(root->instrument);
+//		free(root->instrument);
 		free(root);
 	}
-}
-
-void helperToPrint(TreeNode* root) {
-
-	if (root == NULL) {
-		return;
-	}
-	else {
-		//pritn all the left side and the root and the right side.
-		helperToPrint(root->left);
-		printf("%s ", root->instrument);
-		printf("%d ", root->insID);
-		helperToPrint(root->right);
-	}
-
-}
-
-void printTree(InstrumentTree tr) {
-
-	helperToPrint(tr.root);
-
 }
 
 //purpose: search the ID of an instrument
 //if not find return NULL if find return the ID
 int findInsId(InstrumentTree tree, char* instrument){
 
-	int flage;
+	int flage, id;
 	flage = 0;
-	int id;
 	helperFindInsId(tree.root, instrument,&flage,&id);
 
 	if (flage == 0) {
@@ -216,6 +195,7 @@ void saveMusicianFromFile(char* filename, InstrumentTree* tr) {
 
 	Musician** musicianGroup;
 	musicianGroup = (Musician**)malloc(sizeof(Musician*) * psizeForMusicianArray);
+	chekeAlloction(musicianGroup);
 
 	ptr = fgets(line, 150, fp);
 
@@ -225,9 +205,11 @@ void saveMusicianFromFile(char* filename, InstrumentTree* tr) {
 		if (lsizeForMusicianArray == psizeForMusicianArray) {
 			psizeForMusicianArray = psizeForMusicianArray * 2;
 			musicianGroup = (Musician**)realloc(musicianGroup, psizeForMusicianArray * (sizeof(Musician*)));
+			chekeAlloction(musicianGroup);
 		}
 
 		musicianGroup[lsizeForMusicianArray] = (Musician*)malloc(sizeof(Musician));
+		chekeAlloction(musicianGroup[lsizeForMusicianArray]);
 		makeEmptyList(&(musicianGroup[lsizeForMusicianArray]->instrument));
 
 		name = buildNameAndList(&musicianGroup, tr, lsizeForMusicianArray, line, &lsizeName);
@@ -243,6 +225,8 @@ void saveMusicianFromFile(char* filename, InstrumentTree* tr) {
 	buildArrayOfMusicianCollection(musicianGroup, tr, lsizeForMusicianArray);
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////
+  /////////// FUNCTION HELP MPILIST : LINKED LIST (MAKE EMPTY-INSERTNODE-CREAT NODE)//////////
 void makeEmptyList(MPIList* lst) {
 
 	lst->head = lst->tail = NULL;
@@ -275,6 +259,8 @@ void creatNodeAndInsertToTail(MPIList* lst,ListNode *next, unsigned short insID,
 	
 }
 
+//******************************************************************************************************
+//******************************************************************************************************
 
 char **buildNameAndList(Musician ***musicianGroup,InstrumentTree *tr,int lsizeForMusicianArray,char *line,int *lsizeName) {
 
@@ -304,6 +290,7 @@ char **buildNameAndList(Musician ***musicianGroup,InstrumentTree *tr,int lsizeFo
 			if (*lsizeName == psize) {
 				psize = psize * 2;
 				name = (char**)realloc(name, psize * (sizeof(char*)));
+				chekeAlloction(name);
 			}
 
 			nameLenght = strlen(token);
@@ -334,6 +321,8 @@ void buildArrayOfMusicianCollection(Musician** musicianGroup, InstrumentTree* tr
 	int numOfInstrument = getNumOfInstrument(tr);
 	int* arrOfSize = (int*)malloc(sizeof(int) * numOfInstrument);
 	Musician*** musicianCollection = (Musician***)malloc(sizeof(Musician**) * numOfInstrument);
+	chekeAlloction(arrOfSize);
+	chekeAlloction(musicianCollection);
 
 	int id;
 
@@ -381,6 +370,7 @@ Musician** getArrayOfMusicianWhoPlayTheSameInstrument(Musician **musicianGroup, 
 
 	Musician** musicianGroupofTheSameInstrument;
 	musicianGroupofTheSameInstrument= (Musician**)malloc(sizeof(Musician*) * psizeForMusicianArray);
+	chekeAlloction(musicianGroupofTheSameInstrument);
 
 	//loop that run one the musician group for search the ID on the array
 	//every one who have this ID one this array so a get him for my new array
@@ -391,7 +381,9 @@ Musician** getArrayOfMusicianWhoPlayTheSameInstrument(Musician **musicianGroup, 
 		if (lsizeForMusicianArray == psizeForMusicianArray) {
 			psizeForMusicianArray = psizeForMusicianArray * 2;
 			musicianGroupofTheSameInstrument = (Musician**)realloc(musicianGroupofTheSameInstrument, psizeForMusicianArray * (sizeof(Musician*)));
+			chekeAlloction(musicianGroupofTheSameInstrument);
 		}
+
 
 		 tmp=getTheMusicianWhoPlayTheSameInstrument(musicianGroup, i,id);
 		
@@ -402,6 +394,7 @@ Musician** getArrayOfMusicianWhoPlayTheSameInstrument(Musician **musicianGroup, 
 		 }
 	} 
 	musicianGroupofTheSameInstrument = (Musician**)realloc(musicianGroupofTheSameInstrument, lsizeForMusicianArray * (sizeof(Musician*)));
+	chekeAlloction(musicianGroupofTheSameInstrument);
 	arrofsize[id] = lsizeForMusicianArray;
 
 	return musicianGroupofTheSameInstrument;
@@ -414,6 +407,7 @@ Musician* getTheMusicianWhoPlayTheSameInstrument(Musician** musicianGroup,int in
 	MPIList lst = musicianGroup[index]->instrument;
 	ListNode* cur = lst.head;
 	Musician *musicianGroupofTheSameInstrument = (Musician*)malloc(sizeof(Musician));
+	chekeAlloction(musicianGroupofTheSameInstrument);
 
 	while (cur != NULL) {
 
@@ -424,59 +418,76 @@ Musician* getTheMusicianWhoPlayTheSameInstrument(Musician** musicianGroup,int in
 		}
 		cur = cur->next;
 	}
+	//free the data because he dont find the ID in the list
+	free(musicianGroupofTheSameInstrument);
 	return NULL;
 }
 
 //arrofsize-this is an array that save my size of every array 
 //example - arrofsize[0] save the size of array musician in place 0 of array collection
-void getConcertFromTheUserAndShowConcert(InstrumentTree tr, Musician ***musicianCollection,int numOfInstrument,int *arrOfSize) {
-	int lenghtLine,sizeArray=0;
-	int* arrOfsizeOfMusicianWhoPlay;
-	char* str,*name;
-	IDName* arrInstrument;
-	Date *date;
+void getConcertFromTheUserAndShowConcert(InstrumentTree tr, Musician*** musicianCollection, int numOfInstrument, int* arrOfSize) {
+	int lenghtLine, saveSizeArray = 0, sizeArray = 0;
+	int* arrOfsizeOfMusicianWhoPlay = NULL;
+	char* str, * name;
+	IDName* arrInstrument = NULL;
+	Date* date;
 	date = (Date*)malloc(sizeof(Date));
-	str=getStringe();
-	lenghtLine = strlen(str);
-	name = (char*)malloc(sizeof(char)*lenghtLine);
-	CIList lst;
-	Musician ***allMusicianWhoPlayInConcert;
+	chekeAlloction(date);
+	str = getStringe();
+	if (str != NULL) {
 
-	while (str != NULL) {
+		lenghtLine = strlen(str);
+		CIList lst;
+		Musician*** allMusicianWhoPlayInConcert = NULL;
 
-		sscanf(str, "%s %d %d %d %f:%f",name,&date->day,&date->month,&date->year,&date->hour,&date->min);
-		lenghtLine = strlen(name);
-		name = (char*)realloc(name, lenghtLine+1);
-		name[lenghtLine + 1] = '\0';
+		while (str != NULL) {
 
-		arrInstrument = getListOfInstrumentInTheConcert(str, tr,&lst);
-		arrangeArrayAppropriateToTheImportance(lst, musicianCollection,arrOfSize);
+			lenghtLine = strlen(str);
+			name = (char*)malloc(sizeof(char) * lenghtLine);
+			chekeAlloction(name);
 
-		//array whit number of every musician i need to a concert for veri instrument
-		arrOfsizeOfMusicianWhoPlay = getArrOfSizeOfEvryInstrument(lst);
+			sscanf(str, "%s %d %d %d %f:%f", name, &date->day, &date->month, &date->year, &date->hour, &date->min);
+			lenghtLine = strlen(name);
+			name = (char*)realloc(name, lenghtLine + 1);
+			chekeAlloction(name);
+			name[lenghtLine + 1] = '\0';
 
-		allMusicianWhoPlayInConcert=arrangeMusicianToConcert(lst, musicianCollection, arrOfSize,&sizeArray,arrOfsizeOfMusicianWhoPlay);
+			arrInstrument = getListOfInstrumentInTheConcert(str, tr, &lst);
+			arrangeArrayAppropriateToTheImportance(lst, musicianCollection, arrOfSize);
 
-		if (allMusicianWhoPlayInConcert == NULL) {
-			printError(name);
+			//array whit number of every musician i need to a concert for veri instrument
+			arrOfsizeOfMusicianWhoPlay = getArrOfSizeOfEvryInstrument(lst);
+
+			allMusicianWhoPlayInConcert = arrangeMusicianToConcert(lst, musicianCollection, arrOfSize, &sizeArray, arrOfsizeOfMusicianWhoPlay);
+
+			if (allMusicianWhoPlayInConcert == NULL) {
+				printError(name);
+			}
+			else {
+				//allmusicianwhoplayinconcert- this is the new array collection whit the musician that playing in the concert
+			   //sizearray- is my size of this array 
+				printTheConcert(allMusicianWhoPlayInConcert, sizeArray, name, date, arrOfsizeOfMusicianWhoPlay, arrInstrument);
+			}
+
+			saveSizeArray = sizeArray;
+			sizeArray = 0;
+			free(str);
+			freeCIlist(lst);
+			//free the arr IDName structur 
+			freeARRIDName(arrInstrument, saveSizeArray);
+			str = getStringe();
 		}
-		else {
-             //allmusicianwhoplayinconcert- this is the new array collection whit the musician
-			//sizearray- is my size of this array 
-			printTheConcert(allMusicianWhoPlayInConcert,sizeArray,name,date,arrOfsizeOfMusicianWhoPlay, arrInstrument);
-		}
-
-		sizeArray = 0;
-		str = getStringe();
 	}
+	freeData(arrOfSize, musicianCollection, numOfInstrument, date, saveSizeArray, arrInstrument);
 }
+
 
 
 char* getStringe() {
 	char* str;
 	int logSize = 0, phySize = 1, flage = 0;
 	char c;
-
+	printf(" Please enter the Concert woul you like to cheke : \n ");
 	str = (char*)malloc(sizeof(char) * phySize);
 	chekeAlloction(str);
 	c = getchar();
@@ -494,25 +505,25 @@ char* getStringe() {
 	}
 
 	str = (char*)realloc(str, sizeof(char) * (logSize +1));
+	chekeAlloction(str);
 	str[logSize] = '\0';
 	flage=chekeIfLineBlanc(str);
-	if (flage == 0)
+	if (flage == 0) {
+		free(str);
 		return NULL;
+	}
 
 	return str;
 }
 
 int chekeIfLineBlanc(char* str) {
 	 
-	int i = 0, flage = 0;
+	int flage = 1;
 
-	while (str[i] != '\0') {
+	if (strlen(str) == 0) {
+		flage = 0;
+		return flage;
 
-		if (str[i] != ' ') {
-			flage = 1;
-			return flage;
-		}
-		i++;
 	}
 
 	return flage;
@@ -540,6 +551,7 @@ IDName* getListOfInstrumentInTheConcert(char *str,InstrumentTree tr,CIList *alst
 			if (lsize == psize) {
 				psize = psize * 2;
 				arrInstrument = (IDName*)realloc(arrInstrument,psize*(sizeof(IDName)));
+				chekeAlloction(arrInstrument);
 			}
 
 			CInstrument = (ConcertInstrument*)malloc(sizeof(ConcertInstrument));
@@ -570,10 +582,13 @@ IDName* getListOfInstrumentInTheConcert(char *str,InstrumentTree tr,CIList *alst
 	}
 	
 	arrInstrument = (IDName*)realloc(arrInstrument,(sizeof(IDName)*lsize));
+	chekeAlloction(arrInstrument);
 	*alst = lst;
 	return arrInstrument;
 }
 
+////////////////***********************************////////////////////////////////////////////
+///            FUNTION HELP CILIST : LIKEND LIST (MAKE EMPTY ,INSER NODE,CREATE NODE //////////
 void makeEmptyCIList(CIList* lst) {
 
 	lst->head = lst->tail = NULL;
@@ -607,98 +622,80 @@ void creatNodeAndInsertToCIListTail(CIList* lst, CIListNode* next,ConcertInstrum
 
 }
 
+////////////////************************////////////////////////////////////////////////
+///***************************************************************************//////////
+
+
+//function for arrange the array accordinate to the importance
+//if the importance is 1 so arrange the array of musician from high to low if 0 from low to zero
+//use an array of salary for help the qsort .
 void arrangeArrayAppropriateToTheImportance(CIList lst, Musician*** musicianCollection,int *arrOfSize) {
 
 	CIListNode* cur;
 	cur = lst.head;
 	int id;
+	
 
 	while (cur != NULL) {
 
 		id = cur->CInstrument.inst;
-		
+
+		int* arrhelper = (int*)malloc(sizeof(int) * arrOfSize[id]);
+		copySalaryToArr(musicianCollection[id], arrhelper, arrOfSize[id], id);
+
 		if (cur->CInstrument.importance == 1) {
 
-			sortArrayMusicianOfThisIDInstrumentToLower(musicianCollection[id],arrOfSize[id], id);
+			sortArrayMusicianOfThisIDInstrumentToLower(musicianCollection[id],arrOfSize[id], id,arrhelper);
 		}else {
 
-			sortArrayMusicianOfThisIDInstrumentToHigher(musicianCollection[id], arrOfSize[id], id);
+			sortArrayMusicianOfThisIDInstrumentToHigher(musicianCollection[id], arrOfSize[id], id,arrhelper);
 		}
 		cur = cur->next;
 	}
 }
 
-void sortArrayMusicianOfThisIDInstrumentToLower(Musician **musician,int size,int  id) {
 
-	ListNode* cur,*cur2;
-	int i ,j;
-	int price,price2;
+//sorting the array salary of an ID musician 
+//sort with qsort
+//after sorting -> arrange the musician ID accordinate to the order of the salary array
+void sortArrayMusicianOfThisIDInstrumentToLower(Musician **musician,int size,int  id,int *arrhelper) {
 
-	for (i = 0; i < size-1; i++) {
+	qsort(arrhelper,size,sizeof(int),cmpToLower);
+	copySortingSalaryToMusicianArr(musician, arrhelper, size,id);
+	free(arrhelper);
 
-		for (j = 0; j < size - i-1; j++) {
-
-			cur = musician[j]->instrument.head;
-			cur2 = musician[j + 1]->instrument.head;
-
-			while (cur != NULL) {
-
-				if (cur->mpi.insID == id) {
-					price = cur->mpi.price;
-				}
-
-				cur = cur->next;
-			}
-			while (cur2 != NULL) {
-
-				if (cur2->mpi.insID == id) {
-					price2 = cur2->mpi.price;
-				}
-
-				cur2 = cur2->next;
-			}
-			if (price <= price2) {
-				swap(&(musician[j]), &(musician[j + 1]));
-			}
-		}
-	}
 }
 
-void sortArrayMusicianOfThisIDInstrumentToHigher(Musician** musician, int size, int  id) {
+//function compare for the qsort function
+int cmpToLower(void *a ,void *b) {
 
-	ListNode* cur, * cur2;
-	int i, j;
-	int price, price2;
+	int* firstSalary = (int*)a;
+	int* secondSalary = (int*)b;
 
-	for (i = 0; i < size - 1; i++) {
-
-		for (j = 0; j < size - i - 1; j++) {
-
-			cur = musician[j]->instrument.head;
-			cur2 = musician[j + 1]->instrument.head;
-
-			while (cur != NULL) {
-
-				if (cur->mpi.insID == id)
-					price = cur->mpi.price;
-
-				cur = cur->next;
-			}
-			while (cur2 != NULL) {
-
-				if (cur2->mpi.insID == id)
-					price2 = cur2->mpi.price;
-
-				cur2 = cur2->next;
-			}
-			if (price >= price2) {
-				swap(&(musician[j]), &(musician[j + 1]));
-			}
-		}
-	}
+	return ( (*secondSalary)- (*firstSalary));
 }
 
+//function compare for the qsort function this function return a num if the nume is positive so the first num is 
+//higher then the second in the array.
+int cmpToHigher(void* a, void* b) {
 
+	int* firstSalary = (int*)a;
+	int* secondSalary = (int*)b;
+
+	return ((*firstSalary) - (*secondSalary));
+}
+
+//sorting the array salary of an ID musician 
+//sort with qsort
+//after sorting -> arrange the musician ID accordinate to the order of the salary array
+void sortArrayMusicianOfThisIDInstrumentToHigher(Musician** musician, int size, int  id ,int *arrhelper) {
+
+	qsort(arrhelper, size, sizeof(int), cmpToHigher);
+	copySortingSalaryToMusicianArr(musician, arrhelper, size, id);
+	free(arrhelper);
+}
+
+//simple function swap with pointer swaping
 void swap(Musician** a, Musician** b) {
 	
 	Musician* tmp;
@@ -742,6 +739,7 @@ Musician*** arrangeMusicianToConcert(CIList lst, Musician*** musicianCollection,
 		if (*lsize == psize) {
 			psize = psize * 2;
 			allMusicianWhoPlayInConcert = (Musician***)realloc(allMusicianWhoPlayInConcert, sizeof(Musician**) * psize);
+			chekeAlloction(allMusicianWhoPlayInConcert);
 		}
 		//this function will get the the musician who will play in the concert
 		//for every instrument with go over the array collection 
@@ -762,8 +760,11 @@ Musician*** arrangeMusicianToConcert(CIList lst, Musician*** musicianCollection,
 		}
 		cur = cur->next;
 	}
-
+	
+	//this function make zero the choosen because i finish to chooze my musician but not free the arrray
+	makeZeroOnChoosenMusician(allMusicianWhoPlayInConcert, *lsize, arrOfsizeWMP);
 	allMusicianWhoPlayInConcert = (Musician***)realloc(allMusicianWhoPlayInConcert, sizeof(Musician**) * (*lsize));
+	chekeAlloction(allMusicianWhoPlayInConcert);
 	return allMusicianWhoPlayInConcert;
 }
 
@@ -777,12 +778,14 @@ Musician** getMusicianWhoWillPlayInConcert(Musician** musician, int size,int num
 	ListNode* cur;
 	int j = 0, counter = 0;
 	Musician** musicianplayinconcert = (Musician**)malloc(sizeof(Musician*) * num);
+	chekeAlloction(musicianplayinconcert);
 
 	while (counter != num && j < size) {
 
 		if (musician[j]->chozen == 0) {
 
 			musician[j]->chozen = 1;
+			//theye point to the same pointer so i need be carfule whene i free my arr (musiciainplayinconcert)
 			musicianplayinconcert[counter] = musician[j];
 			counter++;
 		}
@@ -809,6 +812,8 @@ Musician** getMusicianWhoWillPlayInConcert(Musician** musician, int size,int num
 	}
 }
 
+//function puprose - a function for build an array that save me the number of every musician i need of 
+//one instrument in the concert
 int* getArrOfSizeOfEvryInstrument(CIList lst) {
 
 	CIListNode* cur;
@@ -817,18 +822,21 @@ int* getArrOfSizeOfEvryInstrument(CIList lst) {
 	int psize = 2;
 
 	int* arrOfsizeOfEvryInstrument = (int*)malloc(sizeof(int) * psize);
+	chekeAlloction(arrOfsizeOfEvryInstrument);
 
 	while (cur != NULL) {
 
 		if (psize == lsize) {
 			psize = psize * 2;
 			arrOfsizeOfEvryInstrument = (int*)realloc(arrOfsizeOfEvryInstrument, sizeof(int*) * psize);
+			chekeAlloction(arrOfsizeOfEvryInstrument);
 		}
 		arrOfsizeOfEvryInstrument[lsize] = cur->CInstrument.num;
 		lsize++;
 		cur = cur->next;
 	}
-
+	arrOfsizeOfEvryInstrument = (int*)realloc(arrOfsizeOfEvryInstrument, sizeof(int*) * lsize);
+	chekeAlloction(arrOfsizeOfEvryInstrument);
 	return arrOfsizeOfEvryInstrument;
 }
 
@@ -843,11 +851,65 @@ void makeZeroOnChoosenMusician(Musician*** allMusicianWhoPlayInConcert, int size
 		for (j = 0; j < arrSize[i]; j++) {
 			allMusicianWhoPlayInConcert[i][j]->chozen = 0;
 		}
-		free(allMusicianWhoPlayInConcert[i]);
 	}
-	free(allMusicianWhoPlayInConcert);
 }
 
+//function puprose - copy the salary to the arr
+//this arr will help me for the sorting challenge
+void copySalaryToArr(Musician**  musician,int *arrhelper,int size,int id) {
+
+	ListNode* cur;
+	int i;
+
+
+	for (i = 0; i < size; i++) {
+
+		cur = musician[i]->instrument.head;
+
+		while (cur != NULL) {
+
+			if (cur->mpi.insID == id) {
+
+				arrhelper[i] = cur->mpi.price;
+			}
+
+			cur = cur->next;
+		}
+
+	}
+}
+
+//function purpose - function that get an sorting array with the salary of an ID instrument
+//and accordinate to the array salary I sort my musician array
+void copySortingSalaryToMusicianArr(Musician**  musician, int* arrhelper, int size, int id ) {
+
+	ListNode* cur;
+	int i=0,j=0;
+
+
+	while (i < size) {
+
+		cur = musician[j]->instrument.head;
+
+		while (cur != NULL) {
+
+			if (cur->mpi.insID == id && cur->mpi.price == arrhelper[i]) {
+
+				swap(&musician[i] ,&musician[j]);
+				i++;
+				j = -1;
+			}
+			cur = cur->next;
+		}
+		j++;
+	}
+
+
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+//*******************   FUNCTION FOR PRINTING DATA **********************************///////////
 void printError(char* name) {
 
 	printf("Could not find musicians for the concert %s \n", name);
@@ -863,11 +925,20 @@ void printError(char* name) {
 void printTheConcert(Musician*** allMusician,int size, char* name, Date *date,int *arrOfsizeOfMusicianWhoPlay,IDName* arrInstrument) {
 	 
 	int totalePrice=0;
-	//totaleprice=getTheToTalPrice(allMusician)
-	printf("the concert : %s \n", name);
-	printf("at this time : %d \ %d \%d %f : %f \n", date->day, date->month, date->year, date->hour, date->min);
+
+	printf("*********************************************************************** \n");
+	printf("*****             THE CONCERT : %s                             ****** \n", name);
+	if (date->min >= 0 && date->min <= 9) {
+		printf("*****          TIME OF THE CONCERT : %d/%d/%d  %.f:0%.f           ****** \n", date->day, date->month, date->year, date->hour, date->min);
+	}
+	else {
+		printf("*****          TIME OF THE CONCERT : %d/%d/%d  %.f:%.f           ****** \n", date->day, date->month, date->year, date->hour, date->min);
+	}
+	printf("*********************************************************************** \n");
 	printArrayCollection(allMusician, size, arrOfsizeOfMusicianWhoPlay, arrInstrument,&totalePrice);
-	printf("the total Price for this cocncert is : %d \n", totalePrice);
+
+	printf("  The total Price for this concert is : %d \n", totalePrice);
+	printf("\n");
 }
 
 void printArrayCollection(Musician*** musicianCollection, int numOfInstrument, int* arrOfsizeOfMusicianWhoPlay, IDName* arrInstrument,int *totalPrice) {
@@ -876,26 +947,26 @@ void printArrayCollection(Musician*** musicianCollection, int numOfInstrument, i
 
 	for (i = 0; i < numOfInstrument; i++) {
 
-		printf("the name of the instrument: %s \n", arrInstrument[i].nameOfInstrument);
-		printArrayOfMusician(musicianCollection[i], arrOfsizeOfMusicianWhoPlay[i],arrInstrument[i].idOfInstrument,totalPrice);
+		printf(" The musician who will play on : %s \n", arrInstrument[i].nameOfInstrument);
+		printArrayOfMusician(musicianCollection[i], arrOfsizeOfMusicianWhoPlay[i],arrInstrument[i].idOfInstrument,totalPrice, arrInstrument[i].nameOfInstrument);
 
 	}
 }
 
-void printArrayOfMusician(Musician** musicianGroup, int size,int id,int *totalPrice) {
+void printArrayOfMusician(Musician** musicianGroup, int size,int id,int *totalPrice,char *nameInstrument) {
 
 	int i;
 	
 	for (i = 0; i < size; i++) {
 
 		printName(musicianGroup[i]->lenghtName, musicianGroup[i]->name);
-		printPrice(musicianGroup[i]->instrument,id,totalPrice);
+		printPrice(musicianGroup[i]->instrument,id,totalPrice,nameInstrument, musicianGroup[i]->name, musicianGroup[i]->lenghtName);
 
 	}
 
 }
 
-void printPrice(MPIList lst, int id,int *totalPrice) {
+void printPrice(MPIList lst, int id,int *totalPrice, char* nameInstrument,char** name,int lenName) {
 
 
 	ListNode* cur;
@@ -905,7 +976,9 @@ void printPrice(MPIList lst, int id,int *totalPrice) {
 
 		if (cur->mpi.insID==id) {
 
-			printf("the price of the instrument is :%f \n", cur->mpi.price);
+			printf(" The price for that ");
+			printName(lenName, name);
+			printf(" play on the %s is :%f \n", nameInstrument, cur->mpi.price);
 			*totalPrice = *totalPrice + cur->mpi.price;
 		}
 
@@ -918,7 +991,7 @@ void printName(int legnthName,char **name) {
 
 	int i;
 
-	printf("the musician : \n");
+	printf(" The musician :  ");
 
 	for (i = 0; i < legnthName; i++) {
 
@@ -926,4 +999,83 @@ void printName(int legnthName,char **name) {
 
 	}
 	printf("\n");
+	printf("\n");
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+//********************************* FREE FUNCTIONS    *******************************///////////
+
+void freeData(int* arrOfsize, Musician*** MusicianCollection,int sizeArrayCollcetion, Date* date,int sizeArray, IDName* arrInstrument) {
+
+	//free the date of the concert 
+	free(date);
+
+	//free the musician who was choosen in the previos concert
+	freeMusicianCollection(MusicianCollection, arrOfsize, sizeArrayCollcetion);
+
+}
+
+//free the arr IDName structur 
+void freeARRIDName(IDName* arrInstrument, int sizeArray) {
+	int i;
+
+	for (i = 0; i < sizeArray; i++) {
+
+		free(arrInstrument[i].nameOfInstrument);
+	}
+	free(arrInstrument);
+
+}
+
+//free the musician who was choosen in the previos concert
+void freeMusicianCollection(Musician ***musicianCollection,int* arrOfsize,int sizeArray) {
+
+	int i,j;
+
+	for (i = 0; i < sizeArray; i++) {
+
+		for (j = 0; j < arrOfsize[i] && musicianCollection[i][j]->chozen!= 2; j++) {
+
+			//free the MPIlist 
+			freeMPIlist(musicianCollection[i][j]->instrument);
+
+			free(musicianCollection[i][j]->name);
+
+			musicianCollection[i][j]->chozen = 2;
+
+		}
+		free(musicianCollection[i]);
+	}
+	//free the array collection and he size array
+	free(musicianCollection);
+	free(arrOfsize);
+}
+
+//free list of the instrument  in the concert
+void freeCIlist(CIList lst) {
+
+	CIListNode* cur,* next;
+	cur = lst.head;
+
+	while (cur != NULL) {
+
+		next = cur->next;
+		free(cur);
+		cur = next;
+	}
+
+}
+
+//free list of the instrument  in the concert
+void freeMPIlist(MPIList lst) {
+
+	ListNode* cur,*next;
+	cur = lst.head;
+
+	while (cur != NULL) {
+		next = cur->next;
+		free(cur);
+		cur =next;
+	}
+
 }

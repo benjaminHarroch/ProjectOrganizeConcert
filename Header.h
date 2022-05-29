@@ -7,6 +7,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+
+///******************************************************************************////
+//               ALL MY HELPER STRUCTUR IN THE PROJECT                           ////
+
 typedef struct treeNode {
 
 	char* instrument;
@@ -96,6 +100,8 @@ typedef struct IdandName {
 }IDName;
 
 
+///***************************************************************************************///////
+//                    ALL MY FUNCTIONS NAME SIGNATURE IN THE PROJECT                      ///////
 
 void buildBinaryTreeFromFile(char* filename, InstrumentTree* tr);
 TreeNode* creatTreeNode(char* instrument, unsigned short *insID, TreeNode* left, TreeNode* right);
@@ -103,10 +109,8 @@ char* getTheInstrument(FILE* fp);
 void chekeIfOpen(FILE* fp);
 void chekeAlloction(void* ptr);
 void helperBuild(TreeNode* root, char* instrument, int* flage, int* id);
-void freeTree(InstrumentTree tr);
+void freeTree(InstrumentTree *tr);
 void  FreeTreehelper(TreeNode* root);
-void helperToPrint(TreeNode* root);
-void printTree(InstrumentTree tr);
 int findInsId(InstrumentTree tree, char* instrument);
 void helperFindInsId(TreeNode* root, char* instrument, int* flage, int* id);
 void saveMusicianFromFile(char* filename, InstrumentTree* tr);
@@ -127,8 +131,8 @@ void makeEmptyCIList(CIList* lst);
 void insertNodeToCIListTail(CIList* lst, CIListNode* cur);
 void creatNodeAndInsertToCIListTail(CIList* lst, CIListNode* next, ConcertInstrument* CInstrument);
 void arrangeArrayAppropriateToTheImportance(CIList lst, Musician*** musicianCollection);
-void sortArrayMusicianOfThisIDInstrumentToHigher(Musician** musician, int size, int  id);
-void sortArrayMusicianOfThisIDInstrumentToLower(Musician** musician, int size, int  id);
+void sortArrayMusicianOfThisIDInstrumentToHigher(Musician** musician, int size, int  id, int* arrhelper);
+void sortArrayMusicianOfThisIDInstrumentToLower(Musician** musician, int size, int  id, int* arrhelper);
 void swap(Musician** a, Musician** b);
 Musician*** arrangeMusicianToConcert(CIList lst, Musician*** musicianCollection, int* arrOfSize, int* lsize, int* arrOfsizeWMP);
 Musician** getMusicianWhoWillPlayInConcert(Musician** musician, int size, int num);
@@ -137,6 +141,15 @@ void makeZeroOnChoosenMusician(Musician*** allMusicianWhoPlayInConcert, int size
 void printError(char* name);
 void printTheConcert(Musician*** allMusician, int size, char* name, Date* date, int* arrofsize, IDName* arrInstrument);
 void printArrayCollection(Musician*** musicianCollection, int numOfInstrument, int* arrofsize, IDName* arrInstrument, int* totalPrice);
-void printArrayOfMusician(Musician** musicianGroup, int size, int id, int* totalPrice);
-void printPrice(MPIList lst, int id, int* totalPrice);
+void printArrayOfMusician(Musician** musicianGroup, int size, int id, int* totalPrice, char* nameInstrument);
+void printPrice(MPIList lst, int id, int* totalPrice, char* nameInstrument, char **name,int lenName);
 void printName(int legnthName, char** name);
+void copySalaryToArr(Musician** musician, int* arrhelper, int size, int id);
+void copySortingSalaryToMusicianArr(Musician** musician, int* arrhelper, int size, int id);
+int cmpToLower(void* a, void* b);
+int cmpToHigher(void* a, void* b);
+void freeData(int* arrOfsize, Musician*** musicianCollection, int sizeArrayCollection, Date* date,int sizeArray, IDName* arrInstrument);
+void freeARRIDName(IDName* arrInstrument, int sizeArray);
+void freeMusicianCollection(Musician*** musicianCollection, int* arrOfsize, int sizeArray);
+void freeCIlist(CIList lst);
+void freeMPIlist(MPIList lst);
